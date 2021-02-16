@@ -26,23 +26,7 @@ namespace MiniBook.Identity
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            var connectionString = Configuration.GetConnectionString("DefaultConnection");
-
-            services.AddDbContext<MinibookContext>(options => {
-                options.UseSqlServer(connectionString);
-            });
-            services.AddIdentity<User, IdentityRole>()
-                .AddEntityFrameworkStores<MinibookContext>()
-                .AddDefaultTokenProviders();
-
-            services.Configure<IdentityOptions>(options =>
-            {
-                options.Password.RequiredLength = 6;
-                options.Password.RequireDigit = false;
-                options.Password.RequireLowercase = false;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = false;
-            });
+            //    var connectionString = Configuration.GetConnectionString("DefaultConnection");
 
 
             services.AddControllers().AddNewtonsoftJson(
@@ -51,14 +35,43 @@ namespace MiniBook.Identity
                    options.SerializerSettings.NullValueHandling = Newtonsoft.Json.NullValueHandling.Ignore;
                    options.SerializerSettings.Formatting = Newtonsoft.Json.Formatting.Indented;
                });
+            services.AddDbContext<MinibookContext>(options =>
+            {
+                // options.UseSqlServer(connectionString);
+                options.UseInMemoryDatabase("memory");
+            });
+
+            services.AddIdentity<IdentityUser, IdentityRole>(
+                config =>
+                {
+                    config.Password.RequiredLength = 4;
+                    config.Password.RequireDigit = false;
+                    config.Password.RequireLowercase = false;
+                    config.Password.RequireNonAlphanumeric = false;
+                    config.Password.RequireUppercase = false;
+                }
+                )
+                .AddEntityFrameworkStores<MinibookContext>()
+                .AddDefaultTokenProviders();
+
+            //services.Configure<IdentityOptions>(options =>
+            //{
+            //    options.Password.RequiredLength = 6;
+            //    options.Password.RequireDigit = false;
+            //    options.Password.RequireLowercase = false;
+            //    options.Password.RequireNonAlphanumeric = false;
+            //    options.Password.RequireUppercase = false;
+            //});
+
+
 
             services.AddIdentityServer()
-              //  .AddInMemoryPersistedGrants()
+         //      .AddInMemoryPersistedGrants()
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddInMemoryApiResources(Config.GetApiResources())
                 .AddInMemoryClients(Config.GetClients())
                 .AddInMemoryApiScopes(Config.GetApiScope())
-                .AddAspNetIdentity<User>()              
+                .AddAspNetIdentity<IdentityUser>()              
                 .AddDeveloperSigningCredential();
 
         }
@@ -80,9 +93,10 @@ namespace MiniBook.Identity
                     new AcceptLanguageHeaderRequestCultureProvider()
                 }
             });
+            app.UseRouting();
+
             app.UseIdentityServer();
 
-            app.UseRouting();
 
 
             //app.UseAuthorization();
