@@ -10,6 +10,7 @@ using Microsoft.Extensions.Hosting;
 using MiniBook.Identity.Configuration;
 using MiniBook.Identity.Data;
 using MiniBook.Identity.Models;
+using MiniBook.Identity.Validations;
 using System.Globalization;
 
 namespace MiniBook.Identity
@@ -49,6 +50,9 @@ namespace MiniBook.Identity
                     config.Password.RequireLowercase = false;
                     config.Password.RequireNonAlphanumeric = false;
                     config.Password.RequireUppercase = false;
+                    config.SignIn.RequireConfirmedPhoneNumber = true;
+                    
+                 
                 }
                 )
                 .AddEntityFrameworkStores<MinibookContext>()
@@ -66,12 +70,14 @@ namespace MiniBook.Identity
 
 
             services.AddIdentityServer()
-         //      .AddInMemoryPersistedGrants()
+               .AddInMemoryPersistedGrants()
                 .AddInMemoryIdentityResources(Config.GetIdentityResources())
                 .AddInMemoryApiResources(Config.GetApiResources())
                 .AddInMemoryClients(Config.GetClients())
                 .AddInMemoryApiScopes(Config.GetApiScope())
-                .AddAspNetIdentity<IdentityUser>()              
+                .AddAspNetIdentity<IdentityUser>()
+               .AddExtensionGrantValidator<PhoneNumberTokenSmsGrantValidator>()
+                .AddExtensionGrantValidator<PhoneNumberPasswordGrantValidator>()
                 .AddDeveloperSigningCredential();
 
         }

@@ -15,6 +15,8 @@ namespace MiniBook.Identity
             {
                 var usermanager = scope.ServiceProvider.GetRequiredService<UserManager<IdentityUser>>();
                 var user = new IdentityUser("bob");
+                user.PhoneNumber = "0376846295";
+                user.PhoneNumberConfirmed = true;
                 usermanager.CreateAsync(user, "password").GetAwaiter().GetResult();
                // usermanager.AddClaimAsync(user, new Claim("rc.garndma", "big.cookie")).GetAwaiter().GetResult();
             }

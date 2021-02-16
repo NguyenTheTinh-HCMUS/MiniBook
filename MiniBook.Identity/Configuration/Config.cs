@@ -1,4 +1,5 @@
-﻿using IdentityServer4.Models;
+﻿using IdentityServer4;
+using IdentityServer4.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -35,12 +36,19 @@ namespace MiniBook.Identity.Configuration
                 new Client
                 {
                     ClientId = "client",
-                    AllowedGrantTypes = GrantTypes.ResourceOwnerPasswordAndClientCredentials,
+                    AllowedGrantTypes = new List<string>{AuthConstants.PhoneNumberTokenSms.GrantType,
+                                                            AuthConstants.PhoneNumberPassword.GrantType,
+                                                            "password"},
                     ClientSecrets =
                     {
                         new Secret("secret".Sha256())
                     },
-                    AllowedScopes = { "api" }
+                    AllowedScopes = { "api",
+                        IdentityServerConstants.StandardScopes.OfflineAccess,
+                        IdentityServerConstants.StandardScopes.Profile,
+                        IdentityServerConstants.StandardScopes.OpenId
+                    },
+                    AllowOfflineAccess=true
                 },
             };
         }
